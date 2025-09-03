@@ -1,0 +1,70 @@
+@import '../../../../vendor/filament/filament/resources/css/theme.css';
+
+@config 'tailwind.config.js';
+
+@layer components {
+    .overflow-x-clip .fi-sidebar-header {
+        @apply bg-blue-500 dark:bg-blue-500;
+    }
+
+    .overflow-x-clip .fi-sidebar-header .fi-icon-btn-icon {
+        @apply text-blue-100 dark:text-blue-100;
+    }
+
+    .fi-sidebar-group .fi-sidebar-group-label {
+        @apply text-blue-100 dark:text-blue-100;
+    }
+
+    .fi-sidebar-group .fi-icon-btn-icon{
+        @apply text-blue-100 dark:text-blue-100;
+    }
+
+    .fi-sidebar-nav {
+        @apply bg-blue-500 dark:bg-blue-500;
+    }
+    .fi-sidebar .fi-sidebar-item {
+        @apply text-white dark:text-white;
+    }
+
+    .fi-sidebar .fi-sidebar-item .fi-sidebar-item-icon {
+        @apply text-white dark:text-white !important;
+    }
+
+    .fi-sidebar .fi-sidebar-item .fi-sidebar-item-label {
+        @apply text-white dark:text-white !important;
+    }
+    .fi-sidebar .fi-sidebar-item.fi-sidebar-item-active {
+        @apply bg-blue-200 dark:bg-blue-800 rounded-[10px];
+    }
+
+    .fi-sidebar .fi-sidebar-item.fi-sidebar-item-active .fi-sidebar-item-label {
+        @apply text-blue-500 dark:text-white !important;
+    }
+
+    .fi-sidebar .fi-sidebar-item.fi-sidebar-item-active .fi-sidebar-item-icon {
+        @apply text-blue-500 dark:text-white !important;
+    }
+    .fi-sidebar .fi-sidebar-item:hover {
+        @apply bg-blue-600 dark:bg-blue-600 rounded-[10px];
+    }
+    .fi-sidebar .fi-sidebar-item:hover .fi-sidebar-item-label {
+        @apply text-blue-500 dark:text-white !important;
+    }
+
+    .fi-sidebar .fi-sidebar-item:hover .fi-sidebar-item-icon {
+        @apply text-blue-500 dark:text-white !important;
+    }
+    .fi-sidebar .fi-sidebar-item.fi-sidebar-item-active:hover .fi-sidebar-item-label {
+        @apply text-blue-500 dark:text-white !important;
+    }
+
+    .fi-sidebar .fi-sidebar-item.fi-sidebar-item-active:hover .fi-sidebar-item-icon {
+        @apply text-blue-500 dark:text-white !important;
+    }
+    .fi-sidebar-group-button-label {
+        @apply text-white dark:text-white;
+    }
+    .fi-sidebar-group-button-icon {
+        @apply text-white dark:text-white;
+    }
+}
