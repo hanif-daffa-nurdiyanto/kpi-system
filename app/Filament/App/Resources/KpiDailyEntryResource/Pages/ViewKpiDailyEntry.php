@@ -18,6 +18,10 @@ use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Components\RepeatableEntry;
 use App\Filament\App\Resources\KpiDailyEntryResource;
 use App\Filament\App\Resources\KpiDailyEntryResource\Widgets\PerformanceSummaryOverview;
+use App\Models\Department;
+use App\Models\KpiDailyEntry;
+use App\Models\User;
+use Carbon\Carbon;
 
 class ViewKpiDailyEntry extends ViewRecord
 {
@@ -31,15 +35,56 @@ class ViewKpiDailyEntry extends ViewRecord
                 ->color('warning')
                 ->requiresConfirmation()
                 ->visible(fn($record) => $record->status === 'draft')
-                ->action(function() {
-                    $this->record->update([
+                ->action(function ($record, KpiDailyEntry $kpiDailyEntry) {
+                    $record->update([
                         'status' => 'submitted',
-                        'submitted_at' => now(),
+                        'submitted_at' => Carbon::now(),
                     ]);
-                    Notification::make()
-                        ->title('Target Submmitted')
-                        ->success()
-                        ->send();
+                    $creator = User::find($kpiDailyEntry->user_id);
+                    $employee = $kpiDailyEntry->employee;
+                    if (!$employee || !$employee->department_id) {
+                        return;
+                    }
+                    $department = Department::where('id', $employee->department_id)->first();
+                    $departmentName = $department->name ?? 'Unknown Department';
+                    $manager = User::find($department->manager_id);
+                    $superAdmins = User::whereHas('roles', function ($query) {
+                        $query->where('name', 'super_admin');
+                    })->get();
+                    $recipients = $superAdmins->push($manager)->filter();
+                    foreach ($recipients as $recipient) {
+                        $message = "A new KPI entry has been submitted from {$creator->name} (Department: {$departmentName})";
+                        if ($recipient->hasRole('super_admin')) {
+                            $message = "A new KPI entry from {$creator->name} - ({$departmentName}) Department requires attention.";
+                        } elseif ($recipient->id === $manager->id) {
+                            $message = "Your team member {$creator->name} from {$departmentName} Department has submitted a KPI entry.";
+                        }
+                        $title = "New KPI Entry Submitted from {$creator->name} - {$departmentName}";
+                        if ($recipient->hasRole('super_admin')) {
+                            $title = "New KPI Entry Submitted from {$creator->name} - {$departmentName} Department";
+                        } elseif ($recipient->id === $manager->id) {
+                            $title = "New KPI Entry Submitted from {$creator->name}";
+                        }
+                        Notification::make()
+                        ->title($title)
+                        ->body($message)
+                        ->icon('heroicon-o-chart-bar')
+                        ->color('primary')
+                        ->actions([
+                            Action::make('View')
+                                ->button()
+                                ->url(
+                                    fn () => $recipient->hasRole('super_admin')
+                                    ? route('filament.admin.resources.kpi-daily-entries.view', $kpiDailyEntry->id)
+                                    : route('filament.app.resources.kpi-daily-entries.view', $kpiDailyEntry->id),
+                                    false
+                                )
+                                ->markAsRead()
+                        ])
+                        ->seconds(30)
+                        ->broadcast($recipient)
+                        ->sendToDatabase($recipient, isEventDispatched: true);
+                    }
                 }),
             Actions\Action::make('approve')
                 ->icon('heroicon-o-check-circle')

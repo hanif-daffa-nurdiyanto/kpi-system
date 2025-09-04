@@ -653,7 +653,12 @@ class KpiDailyEntryResource extends Resource
                                 ->actions([
                                     Action::make('View')
                                         ->button()
-                                        ->url(route('filament.app.resources.kpi-daily-entries.view', $kpiDailyEntry->id), false)
+                                        ->url(
+                                            fn () => $recipient->hasRole('super_admin')
+                                                ? route('filament.admin.resources.kpi-daily-entries.view', $kpiDailyEntry->id)
+                                                : route('filament.app.resources.kpi-daily-entries.view', $kpiDailyEntry->id),
+                                            false
+                                        )
                                         ->markAsRead()
                                 ])
                                 ->seconds(30)
